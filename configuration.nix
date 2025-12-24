@@ -1,15 +1,4 @@
-{
-  description = "nix-darwin system flake";
-
-  inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
-    nix-darwin.url = "github:nix-darwin/nix-darwin/master";
-    nix-darwin.inputs.nixpkgs.follows = "nixpkgs";
-    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
-  };
-
-  outputs = inputs@{ self, nix-darwin, nixpkgs, nix-homebrew }:
-  let
+ let
     configuration = { pkgs, config, ... }: {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
@@ -26,7 +15,6 @@
 		pkgs.discord
 		pkgs.zip
 		pkgs.unzip
-		pkgs.neofetch
         ];
 
       homebrew = {
@@ -34,15 +22,11 @@
 
 	brews = [
 	  "mas"
-	  "node"
-	  "mongodb-atlas"
 	];
 
 	casks = [
 	  "spotify"
 	  "prismlauncher"
-	  "steam"
-	  "mongodb-compass"
 	];
 
 	masApps = {
@@ -59,9 +43,6 @@
 	dock.autohide = true;
 	dock.enable-spring-load-actions-on-all-items = true;
 	dock.minimize-to-application = true;
-	dock.show-recents = true;
-	dock.showhidden = true;
-	dock.show-process-indicators = false;	
 	dock.persistent-apps = [
 	{
 	 app = "/System//Applications/Mail.app";
@@ -76,7 +57,7 @@
 	 app = "/Applications/Spotify.app";
 	}	
 	{
-	 app = "/System/Applications/Utilities/Terminal.app";
+	 app = "/System/Applications/Utilities/Console.app";
 	}	
 	];
       };
@@ -86,11 +67,6 @@
 
       # Enable alternative shell support in nix-darwin.
       programs.fish.enable = true;
-      programs.fish.shellAbbrs = {
-	nrb = "sudo darwin-rebuild switch --flake /etc/nix-darwin#laptop";
-      };      
-
-      environment.shells = [ pkgs.fish ];
 
       # Set Git commit hash for darwin-version.
       system.configurationRevision = self.rev or self.dirtyRev or null;
@@ -101,23 +77,5 @@
 
       # The platform the configuration will be used on.
       nixpkgs.hostPlatform = "aarch64-darwin";
-    };
-  in
-  {
-    # Build darwin flake using:
-    # $ darwin-rebuild build --flake .#laptop
-    darwinConfigurations."laptop" = nix-darwin.lib.darwinSystem {
-      modules = [ 
-  configuration 
-	nix-homebrew.darwinModules.nix-homebrew
-	{
-		nix-homebrew = {
-			enable = true;
-			enableRosetta = true;
-			user = "iouhase";
-		};
-	}
-	];
-    };
-  };
-}
+    }
+in
